@@ -1,0 +1,22 @@
+trainParHoraireDepart?Paris Gare de Lyon?Valence?13:00?AUCUN?trainsParTrancheHoraires?Montelimar?Valence?00:00?23:00?TPRIX?
+trainsParTrancheHoraires?Montelimar?Valence?00:00?23:00?AUCUN?
+trainsParVilles?Saint-Etienne?Grenoble?AUCUN?00
+trainsParTrancheHoraires?Lyon?Paris?00:00?13:00?AUCUN?
+trainParHoraireDepart?Marseille?Lyon?13:00?AUCUN?
+trainsParTrancheHoraires?marseille?valEnce?00:04?23:10?AUCUN?
+trainParHoraireDepart?LyOn?lYoN?01:02?AUCUN?00
+trainsParTrancheHoraires?lYon?Lyon?00:00?10:00?AUCUN?
+trainsParVilles?Grenoble?Valence?TPRIX?
+trainsParVilles?Grenoble?Valence?AUCUN?
+trainsParTrancheHoraires?paris gare de lyon?valence?01:25?19:00?TDUREE?
+trainsParTrancheHoraires?paris gare de lyon?valence?01:25?19:00?AUCUN?
+trainsParVilles?guingamp?marly-gomont?AUCUN?
+trainsParVilles?paris?bordeaux?AUCUN?
+trainsParVilles?paris?marseille?AUCUN?
+trainsParVilles?paris?lyon?AUCUN?
+trainParHoraireDepart?lyon?paris?12:00?AUCUN?CUN
+trainParHoraireDepart?marseille?lyon?20:30?AUCUN?
+trainsParVilles?grenoble?valence?TDUREE?
+trainsParVilles?grenoble?valence?AUCUN?
+trainsParVilles?grenoble?valence?DUREE?
+trainsParVilles?grenoble?valence?AUCUN?

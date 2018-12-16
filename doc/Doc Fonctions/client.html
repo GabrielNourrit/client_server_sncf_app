@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+	<link href="client_files/prism.css" rel="stylesheet">
+	<script src="client_files/prism.js"></script>
+	</head>
+	<body>
+
+
+
+<input onchange="openFile(event)" type="file"><br>
+<div id="fonction_liste" style="background-color:white;right:0;position:fixed;width:20%;"><a href="index.html">ACCUEIL</a><br><br><a style="margin-left:20px;" href="#erreur"> erreur</a><br><a style="margin-left:20px;" href="#FermetureClient"> FermetureClient</a><br><a style="margin-left:20px;" href="#usage"> usage</a></div>
+<div id="dochtml" style="margin-top:50px;"><h1 style="color:white;background-color:rgba(0,0,0,0.5);">erreur</h1><h3 id="erreur" style="color:skyblue;"> La fonction renvoie l'erreur passé en parametre</h3><br><span style="color:green;"> @param {char*} *pFonction : Erreur à renvoyer</span><br><span style="color:green;"> return void</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+void erreur(char *pFonction){
+    perror(pFonction);
+    exit(errno);
+}
+
+</code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">FermetureClient</h1><h3 id="FermetureClient" style="color:skyblue;"> La fonction gere la fermeture du client avec Controle C</h3><br><span style="color:green;"> @param {int} sig : numéro du signal envoyé</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+void FermetureClient(int sig) {
+    char * tmpMessage = "Fin connexion?";
+    //On envoie la taille du paquet
+    unsigned long *tmpTailleBuffer = (unsigned long *) malloc(sizeof(unsigned long));
+    *tmpTailleBuffer = strlen(tmpMessage);
+    write(tmpIdSocketEcriture,tmpTailleBuffer,sizeof(int));
+    //On envoie le paquet
+    write(tmpIdSocketEcriture, tmpMessage, *tmpTailleBuffer);
+    close(tmpIdSocketEcriture);
+    free(tmpTailleBuffer);
+    exit(0);
+}
+
+
+</code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">usage</h1><h3 id="usage" style="color:skyblue;"> La fonction ecrit un message d'erreur en cas de parametre incorrect</h3><br><span style="color:green;"> @param {char*} *pNomProgramme : Nom du programme</span><br><span style="color:green;"> return void</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+void usage(char *pNomProgramme){
+    fprintf(stderr,"%s prend 2 paramètres, <nomserveur> <numeroport>\n le nom du serveur doit commencer par a-z ou A-Z.\n le numero de port doit etre entier\n", pNomProgramme);
+    exit(-1);
+}
+
+
+void printc(char * pChaine,char* COULEUR){
+    couleur(COULEUR);
+    printf("%s",pChaine);
+    couleur(DEFAUT);
+}
+
+void printfc(char * pChaine,char* COULEUR, char* FOND_COULEUR){
+    couleur(COULEUR);
+    couleur(FOND_COULEUR);
+    printf("%s",pChaine);
+    couleur(DEFAUT);
+}
+
+
+
+</numeroport></nomserveur></code></pre></div>
+
+<script>
+  var openFile = function(event) {
+
+  	let tmpFonctionListe = [];
+
+    var input = event.target;
+
+    var reader = new FileReader();
+    reader.onload = function(){
+      var text = reader.result;
+      let output = reader.result.substring(0, 20000000);
+      //On repere les commentaire et on crÃ©Ã© un tableau adaptÃ©
+      let tmpCommentaire = output.split("/**\n *");
+      let tmpCommentaireSplit = tmpCommentaire.map((e,i)=>{
+      	if(i!=0)
+      		return e.split("*/").map(m=>{
+      			return m.split("\n");
+      		});
+      });
+      console.log(tmpCommentaireSplit);
+      //Generation du HTML
+      let tmpSelector = document.querySelectorAll("#dochtml")[0];
+      let tmpDocGenerer = "";
+
+	  tmpCommentaireSplit.map((e,i)=>{
+	  	if(typeof(e)=="undefined") return;
+	  	var tmpPositionDebutFonction = e[1][1].indexOf(" ");
+	  	var tmpPositionFinFonction = e[1][1].indexOf("(");
+	  	var tmpNomFonction = e[1][1].substr(tmpPositionDebutFonction,tmpPositionFinFonction-tmpPositionDebutFonction)
+	  		tmpFonctionListe.push(tmpNomFonction);
+	  	
+	  	let tmpParams = e[0].map((j,i)=>{
+	  		if(i==0){
+	  			let tmpTitefonction = "<h1 style='color:white;background-color:rgba(0,0,0,0.5);'>"+tmpNomFonction.replace(" ","")+"</h1>";
+	  			return tmpTitefonction+"<h3 id='"+tmpNomFonction.replace(" ","")+"' style='color:skyblue;'>"+j+"</h3>";
+	  		}
+	  		return "<span style='color:green;'>"+j.slice(2)+"</span>";
+	  	}).join("<br>");
+	  	tmpDocGenerer+=tmpParams;
+	  	let tmpCode = "";
+	  	console.log(tmpCommentaireSplit[i]);
+	  	console.log(tmpCommentaireSplit[i].map((ej,ei)=>{
+	  		if(ei==0) return;
+	  		tmpCode+=ej.join("\r\n").replace("/*","//");
+	  	}),tmpCode);
+	  	tmpDocGenerer+='<pre><code class="language-javascript">'+tmpCode+'</code></pre>';
+	  });
+
+
+
+      let tmpSelectorNOmFonction = document.querySelectorAll("#fonction_liste")[0];
+      let tmpFonctionListHTML= tmpFonctionListe.reduce((acc,e,i)=>{
+      	acc=acc+"<br><a style='margin-left:20px;' href='#"+e.replace(" ","")+"'>"+e+"</a>";
+      	return acc;
+      },"");
+	  tmpSelectorNOmFonction.innerHTML="<a href='index.html'>ACCUEIL</a><br/>"+tmpFonctionListHTML;
+      tmpSelector.innerHTML=tmpDocGenerer;
+    };
+    reader.readAsText(input.files[0]);
+  };
+</script>
+
+
+
+
+
+	
+
+
+</body></html>

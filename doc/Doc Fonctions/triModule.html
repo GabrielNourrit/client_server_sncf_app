@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+	<link href="triModule_files/prism.css" rel="stylesheet">
+	<script src="triModule_files/prism.js"></script>
+	</head>
+	<body>
+
+
+
+<input onchange="openFile(event)" type="file"><br>
+<div id="fonction_liste" style="background-color:white;right:0;position:fixed;width:20%;"><a href="index.html">ACCUEIL</a><br><br><a style="margin-left:20px;" href="#CalculerDureeMinimum"> CalculerDureeMinimum</a><br><a style="margin-left:20px;" href="#CalculerCoutMinimum"> CalculerCoutMinimum</a><br><a style="margin-left:20px;" href="#*TrierVoyageParCout"> *TrierVoyageParCout</a><br><a style="margin-left:20px;" href="#*TrierDuree"> *TrierDuree</a><br><a style="margin-left:20px;" href="#TrierTrajets"> TrierTrajets</a><br><a style="margin-left:20px;" href="#filterTrajets"> filterTrajets</a><br><a style="margin-left:20px;" href="#EcartHoraires"> EcartHoraires</a></div>
+<div id="dochtml" style="margin-top:50px;"><h1 style="color:white;background-color:rgba(0,0,0,0.5);">CalculerDureeMinimum</h1><h3 id="CalculerDureeMinimum" style="color:skyblue;"> La fonction calcul du voyage de duree minimum d'un tableau de voyage</h3><br><span style="color:green;"> @param {TableauVoyage*} pTableau :</span><br><span style="color:green;"> @return {int} l'index de la plus petite durée</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+int CalculerDureeMinimum(TableauVoyage *pTableau){
+
+}
+
+
+</code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">CalculerCoutMinimum</h1><h3 id="CalculerCoutMinimum" style="color:skyblue;"> La fonction calcul du voyage de cout minimum d'un tableau de voyage</h3><br><span style="color:green;"> @param {TableauVoyage*} pTableau :</span><br><span style="color:green;"> @return {int} l'index du plus petit cout</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+int CalculerCoutMinimum(TableauVoyage *pTableau){
+    int tmpMinimum=MAX_PRIX+1,tmpMaxindex=0;
+    int const tmpTaille=calculerTailleTableau(pTableau);
+    TableauVoyage *tmpIterateur=pTableau;
+    
+    
+    for(int i=0;i<tmptaille;i++,tmpiterateur=tmpiterateur->suivant){
+        if(tmpIterateur-&gt;v.prix<tmpminimum){ tmpminimum="tmpIterateur-">v.prix;
+            tmpMaxindex=i;
+        }
+    }
+    return tmpMaxindex;
+}
+
+
+</tmpminimum){></tmptaille;i++,tmpiterateur=tmpiterateur-></code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">*TrierVoyageParCout</h1><h3 id="*TrierVoyageParCout" style="color:skyblue;"> La fonction qui trie un tableau de voyage en fonction de leur cout (trie par selection)</h3><br><span style="color:green;"> @param {TableauVoyage} pTableau :</span><br><span style="color:green;"> @return {TableauVoyage*} Le Tableau de voyage trié par ordre croissant en fonction des cout des voyages qu'il contient</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+TableauVoyage *TrierVoyageParCout(TableauVoyage *pTableau){
+
+}
+
+
+</code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">*TrierDuree</h1><h3 id="*TrierDuree" style="color:skyblue;"> La fonction qui trie un tableau de voyage en fonction de leur duree (trie par selection)</h3><br><span style="color:green;"> @param {TableauVoyage} pTableau :</span><br><span style="color:green;"> @return {TableauVoyage*} Le Tableau de voyage trié par ordre croissant en fonction des duree des voyages qu'il contient</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+TableauVoyage *TrierDuree(TableauVoyage *pTableau){
+
+}
+
+</code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">TrierTrajets</h1><h3 id="TrierTrajets" style="color:skyblue;"> La fonction qui trie un tableau de voyage dans un tableau de voyage en fonction de sa duree ou de son prix</h3><br><span style="color:green;"> @param {TableauVoyage} pTableau :</span><br><span style="color:green;"> @param {char *} pFiltre :</span><br><span style="color:green;"> @return {TableauVoyage*} Un Tableau de voyage trié en fonction du filtre passé en parametre</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+TableauVoyage* TrierTrajets(char* pFiltre, TableauVoyage* pListeVoyage)
+{
+    if(!strcmp(pFiltre,"PRIX"))
+        pListeVoyage=TrierVoyageParCout(pListeVoyage);
+    else if(!strcmp(pFiltre,"DUREE"))
+        pListeVoyage=TrierDuree(pListeVoyage);
+    else{
+        fprintf(stderr,"ERREUR MAUVAIS FORMAT FILTRE\n");
+        return NULL;
+    }
+    return pListeVoyage;
+}
+
+
+</code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">filterTrajets</h1><h3 id="filterTrajets" style="color:skyblue;"> La fonction qui retourne une liste contenant le voyage le plus court ou le moins chere</h3><br><span style="color:green;"> @param {TableauVoyage} pTableau :</span><br><span style="color:green;"> @param {char *} pFiltre :</span><br><span style="color:green;"> @return {TableauVoyage*} Un Tableau de voyage trié en fonction du filtre passé en parametre</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+TableauVoyage* filterTrajets(char* pFiltre, TableauVoyage* pListeVoyage)
+{
+    TableauVoyage *tmpTableauVoyage = NULL;
+    if(!strcmp(pFiltre,"PRIX"))
+    {
+        tmpTableauVoyage = ajouter_voyage(tmpTableauVoyage, LireVoyage(pListeVoyage, CalculerCoutMinimum(pListeVoyage)));
+    }
+    else if(!strcmp(pFiltre,"DUREE"))
+    {
+        tmpTableauVoyage = ajouter_voyage(tmpTableauVoyage, LireVoyage(pListeVoyage, CalculerDureeMinimum(pListeVoyage)));
+    }
+    else if(!strcmp(pFiltre,"TPRIX"))
+    {
+        tmpTableauVoyage = TrierTrajets("PRIX",pListeVoyage);
+    }
+    else if(!strcmp(pFiltre,"TDUREE"))
+    {
+        tmpTableauVoyage = TrierTrajets("DUREE",pListeVoyage);
+    }
+    else{
+        fprintf(stderr,"ERREUR MAUVAIS FORMAT FILTRE\n");
+    }
+    return tmpTableauVoyage;
+}
+
+</code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">EcartHoraires</h1><h3 id="EcartHoraires" style="color:skyblue;"> Fonction qui calcul l'ecart en minutes entre deux horraires</h3><br><span style="color:green;"> @param	{horaire} 2 horaires</span><br><span style="color:green;"> @return	{int} l'écart en minutes</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+int EcartHoraires(horaire pHeure1, horaire pHeure2){
+    int tmpMinutes1=(pHeure1.heure*60) + (pHeure1.minute);
+    int tmpMinutes2=(pHeure2.heure*60) + (pHeure2.minute);
+    
+    if(tmpMinutes1<tmpminutes2) return="" tmpminutes2-tmpminutes1;="" else="" tmpminutes1-tmpminutes2;="" }="" <="" code=""></tmpminutes2)></code></pre></div>
+
+<script>
+  var openFile = function(event) {
+
+  	let tmpFonctionListe = [];
+
+    var input = event.target;
+
+    var reader = new FileReader();
+    reader.onload = function(){
+      var text = reader.result;
+      let output = reader.result.substring(0, 20000000);
+      //On repere les commentaire et on crÃ©Ã© un tableau adaptÃ©
+      let tmpCommentaire = output.split("/**\n *");
+      let tmpCommentaireSplit = tmpCommentaire.map((e,i)=>{
+      	if(i!=0)
+      		return e.split("*/").map(m=>{
+      			return m.split("\n");
+      		});
+      });
+      console.log(tmpCommentaireSplit);
+      //Generation du HTML
+      let tmpSelector = document.querySelectorAll("#dochtml")[0];
+      let tmpDocGenerer = "";
+
+	  tmpCommentaireSplit.map((e,i)=>{
+	  	if(typeof(e)=="undefined") return;
+	  	var tmpPositionDebutFonction = e[1][1].indexOf(" ");
+	  	var tmpPositionFinFonction = e[1][1].indexOf("(");
+	  	var tmpNomFonction = e[1][1].substr(tmpPositionDebutFonction,tmpPositionFinFonction-tmpPositionDebutFonction)
+	  		tmpFonctionListe.push(tmpNomFonction);
+	  	
+	  	let tmpParams = e[0].map((j,i)=>{
+	  		if(i==0){
+	  			let tmpTitefonction = "<h1 style='color:white;background-color:rgba(0,0,0,0.5);'>"+tmpNomFonction.replace(" ","")+"</h1>";
+	  			return tmpTitefonction+"<h3 id='"+tmpNomFonction.replace(" ","")+"' style='color:skyblue;'>"+j+"</h3>";
+	  		}
+	  		return "<span style='color:green;'>"+j.slice(2)+"</span>";
+	  	}).join("<br>");
+	  	tmpDocGenerer+=tmpParams;
+	  	let tmpCode = "";
+	  	console.log(tmpCommentaireSplit[i]);
+	  	console.log(tmpCommentaireSplit[i].map((ej,ei)=>{
+	  		if(ei==0) return;
+	  		tmpCode+=ej.join("\r\n").replace("/*","//");
+	  	}),tmpCode);
+	  	tmpDocGenerer+='<pre><code class="language-javascript">'+tmpCode+'</code></pre>';
+	  });
+
+
+
+      let tmpSelectorNOmFonction = document.querySelectorAll("#fonction_liste")[0];
+      let tmpFonctionListHTML= tmpFonctionListe.reduce((acc,e,i)=>{
+      	acc=acc+"<br><a style='margin-left:20px;' href='#"+e.replace(" ","")+"'>"+e+"</a>";
+      	return acc;
+      },"");
+	  tmpSelectorNOmFonction.innerHTML="<a href='index.html'>ACCUEIL</a><br/>"+tmpFonctionListHTML;
+      tmpSelector.innerHTML=tmpDocGenerer;
+    };
+    reader.readAsText(input.files[0]);
+  };
+</script>
+
+
+
+
+
+	
+
+
+</body></html>

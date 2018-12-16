@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+	<link href="fctRequeteClient_files/prism.css" rel="stylesheet">
+	<script src="fctRequeteClient_files/prism.js"></script>
+	</head>
+	<body>
+
+
+
+<input onchange="openFile(event)" type="file"><br>
+<div id="fonction_liste" style="background-color:white;right:0;position:fixed;width:20%;"><a href="index.html">ACCUEIL</a><br><br><a style="margin-left:20px;" href="#clean"> clean</a><br><a style="margin-left:20px;" href="#creer_requete"> creer_requete</a><br><a style="margin-left:20px;" href="#creer_requete_filtre"> creer_requete_filtre</a><br><a style="margin-left:20px;" href="#EstLettre"> EstLettre</a><br><a style="margin-left:20px;" href="#EstVilleValide"> EstVilleValide</a><br><a style="margin-left:20px;" href="#atoiHeure"> atoiHeure</a><br><a style="margin-left:20px;" href="#diviseur_chaine"> diviseur_chaine</a><br><a style="margin-left:20px;" href="#calculHeurePtrPtr"> calculHeurePtrPtr</a><br><a style="margin-left:20px;" href="#envoie_requete_serveur"> envoie_requete_serveur</a></div>
+<div id="dochtml" style="margin-top:50px;"><h1 style="color:white;background-color:rgba(0,0,0,0.5);">clean</h1><h3 id="clean" style="color:skyblue;"> La fonction clear le buffer pour pouvoir par la suite refaire un gets sans avoir des caracteres non souhaité</h3><br><span style="color:green;"></span><br><span style="color:green;"></span><pre><code class="language-javascript">
+void clean(const char *buffer, FILE *fp)
+{
+    char *p = strchr(buffer,'\n');
+    if (p != NULL)
+        *p = 0;
+    else
+    {
+        int c;
+        while ((c = fgetc(fp)) != '\n' &amp;&amp; c != EOF);
+    }
+}
+
+
+</code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">creer_requete</h1><h3 id="creer_requete" style="color:skyblue;"> Fonction qui crée une requête en demandant au client les infos</h3><br><span style="color:green;"> @parar	void</span><br><span style="color:green;"> @return	{char*} requete, la nouvelle requete crée</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+char* creer_requete(char* requete) {
+    //char* requete = (char*) malloc((24+30+30+5+5+5+6)*sizeof(char)); //24 -&gt; type, 30 -&gt; ville, 5 -&gt; horaire, 4 -&gt; option, 6 -&gt; delimiteurs
+    char* type = (char*) malloc(sizeof(char));
+    char* ville_depart = (char*) malloc(30*sizeof(char));
+    char* ville_arrivee = (char*) malloc(30*sizeof(char));
+    char* heure_depart = (char*) malloc(5*sizeof(char));
+    char* heure_arrivee = (char*) malloc(30*sizeof(char));
+    int erreur = 0;
+    
+    printf("Quel type ? (1 -&gt; depart, 2 -&gt; tranche, 3 -&gt; villes) : \n");
+    do {
+        fflush(stdin);
+        fgets(type, 30*sizeof(char), stdin);
+        //viderBuffer();
+        clean(type, stdin);
+        if ((strcmp(type, "1") !=0) &amp;&amp; (strcmp(type, "2") !=0) &amp;&amp; (strcmp(type, "3") !=0)) {
+            erreur = 1;
+            printf("Merci de rentrer 1,2 ou 3 (1 -&gt; depart, 2 -&gt; tranche, 3 -&gt; villes) : \n");
+        }
+        else
+            erreur = 0;
+    } while(erreur);
+    //trier les trains par départ
+    if (strcmp(type, "1") == 0) {
+        printf("Ville de départ (30 caractères max) : \n");
+        do {
+            fflush(stdin);
+            fgets(ville_depart, 30*sizeof(char), stdin);
+            clean(ville_depart, stdin);
+            if (strlen(ville_depart) &gt; 30 || !EstVilleValide(ville_depart)) {
+                if (!EstVilleValide(ville_depart))
+                    printf("Merci de rentrer une ville valide \n");
+                if(strlen(ville_depart) &gt; 30)
+                    printf("30 caractères maxi \n");
+                erreur = 1;
+            }
+            else
+                erreur = 0;
+        } while(erreur);
+        
+        
+        printf("Ville de d'arrivée (30 caractères max) : \n");
+        do {
+            fflush(stdin);
+            fgets(ville_arrivee, 30*sizeof(char), stdin);
+            clean(ville_arrivee, stdin);
+            if (strlen(ville_arrivee) &gt; 30 || !EstVilleValide(ville_arrivee)) {
+                if (!EstVilleValide(ville_arrivee))
+                    printf("Merci de rentrer une ville valide \n");
+                if(strlen(ville_arrivee) &gt; 30)
+                    printf("30 caractères maxi \n");
+                erreur = 1;
+            }
+            else
+                erreur = 0;
+        } while(erreur);
+        
+        int h,m,test_heure;
+        printf("Heure de départ : (Format hh:mm) : \n");
+        do {
+            fflush(stdin);
+            fgets(heure_depart, 30*sizeof(char), stdin);
+            clean(heure_depart, stdin);
+            //Test du format hh:mm
+            test_heure=sscanf(heure_depart, "%d:%d", &amp;h,&amp;m);
+            if (h&lt;0 || h&gt;24 || m&lt;0 || m&gt;60 || (test_heure !=2)) {
+                printf("Merci de rentrer un horaire au format hh:mm : \n");
+                erreur = 1;
+            }
+            else
+                erreur = 0;
+        } while(erreur);
+        
+        //On crée notre requete avec ce qu'a rentré l'utilisateur
+        sprintf(requete, "%s?%s?%s?%s?AUCUN?", "trainParHoraireDepart", ville_depart, ville_arrivee, heure_depart);
+    }
+    //trier les trains par tranche horaire
+    if (strcmp(type, "2") == 0) {
+        //Tant que l'utilisateur donne un nom de ville avec plus de 30 caractères
+        printf("Ville de départ (30 caractères max) : \n");
+        do {
+            fflush(stdin);
+            fgets(ville_depart, 30*sizeof(char), stdin);
+            clean(ville_depart, stdin);
+            if (strlen(ville_depart) &gt; 30 || !EstVilleValide(ville_depart)) {
+                if (!EstVilleValide(ville_depart))
+                    printf("Merci de rentrer une ville valide \n");
+                if(strlen(ville_depart) &gt; 30)
+                    printf("30 caractères maxi \n");
+                //scanf("%s", ville_depart);
+                erreur = 1;
+            }
+            else
+                erreur = 0;
+        } while(erreur);
+        
+        
+        //Tant que l'utilisateur donne un nom de ville avec plus de 30 caractères
+        printf("Ville de d'arrivée (30 caractères max) : \n");
+        do {
+            fflush(stdin);
+            fgets(ville_arrivee, 30*sizeof(char), stdin);
+            clean(ville_arrivee, stdin);
+            if (strlen(ville_arrivee) &gt; 30 || !EstVilleValide(ville_arrivee)) {
+                if (!EstVilleValide(ville_arrivee))
+                    printf("Merci de rentrer une ville valide \n");
+                if(strlen(ville_arrivee) &gt; 30)
+                    printf("30 caractères maxi \n");
+                erreur = 1;
+            }
+            else
+                erreur = 0;
+        } while(erreur);
+        
+        
+        
+        int h,m,test_heure;
+        printf("Heure min : (Format hh:mm) : \n");
+        do {
+            fflush(stdin);
+            fgets(heure_depart, 30*sizeof(char), stdin);
+            clean(heure_depart, stdin);
+            //Test du format hh:mm
+            test_heure=sscanf(heure_depart, "%d:%d", &amp;h,&amp;m);
+            if (h&lt;0 || h&gt;24 || m&lt;0 || m&gt;60 || (test_heure !=2)) {
+                printf("Merci de rentrer un horaire au format hh:mm : \n");
+                erreur = 1;
+            }
+            else
+                erreur = 0;
+        } while(erreur);
+        
+        
+        printf("Heure max : (Format hh:mm) : \n");
+        do {
+            fflush(stdin);
+            fgets(heure_arrivee, 30*sizeof(char), stdin);
+            clean(heure_arrivee, stdin);
+            //Test du format hh:mm
+            test_heure=sscanf(heure_arrivee, "%d:%d", &amp;h,&amp;m);
+            //Tant que l'utilisateur une mauvaise heure (pas de la forme hh:mm, heure &lt; 0 ou heure &gt; 24, minute &lt; 0 ou minute &gt; 60
+            if (h&lt;0 || h&gt;24 || m&lt;0 || m&gt;60 || (test_heure !=2) || (calculHeurePtrPtr(atoiHeure(heure_depart), atoiHeure(heure_arrivee)) &lt;= 0)) {
+                if (calculHeurePtrPtr(atoiHeure(heure_depart), atoiHeure(heure_arrivee)) &lt;= 0)
+                    printf("Merci de rentrer une heure d'arrivée supérieure à l'heure de départ : \n");
+                else
+                    printf("Merci de rentrer un horaire au format hh:mm : \n");
+                erreur = 1;
+            }
+            else
+                erreur = 0;
+        } while(erreur);
+        
+        //On crée notre requete avec ce qu'a rentré l'utilisateur
+        sprintf(requete, "%s?%s?%s?%s?%s?AUCUN?", "trainsParTrancheHoraires", ville_depart, ville_arrivee, heure_depart, heure_arrivee);
+    }
+    //trier les trains par villes
+    if (strcmp(type, "3") == 0) {
+        //Tant que l'utilisateur donne un nom de ville avec plus de 30 caractères
+        printf("Ville de départ (30 caractères max) : \n");
+        do {
+            fflush(stdin);
+            fgets(ville_depart, 30*sizeof(char), stdin);
+            clean(ville_depart, stdin);
+            if (strlen(ville_depart) &gt; 30 || !EstVilleValide(ville_depart)) {
+                if (!EstVilleValide(ville_depart))
+                    printf("Merci de rentrer une ville valide \n");
+                if(strlen(ville_depart) &gt; 30)
+                    printf("30 caractères maxi \n");
+                //scanf("%s", ville_depart);
+                erreur = 1;
+            }
+            else
+                erreur = 0;
+        } while(erreur);
+        
+        
+        //Tant que l'utilisateur donne un nom de ville avec plus de 30 caractères
+        printf("Ville de d'arrivée (30 caractères max) : \n");
+        do {
+            fflush(stdin);
+            fgets(ville_arrivee, 30*sizeof(char), stdin);
+            clean(ville_arrivee, stdin);
+            if (strlen(ville_arrivee) &gt; 30 || !EstVilleValide(ville_arrivee)) {
+                if (!EstVilleValide(ville_arrivee))
+                    printf("Merci de rentrer une ville valide \n");
+                if(strlen(ville_arrivee) &gt; 30)
+                    printf("30 caractères maxi \n");
+                erreur = 1;
+            }
+            else
+                erreur = 0;
+        } while(erreur);
+        
+        //On crée notre requete avec ce qu'a rentré l'utilisateur
+        sprintf(requete, "%s?%s?%s?AUCUN?", "trainsParVilles", ville_depart, ville_arrivee);
+    }
+    
+    //On libère la mémoire
+    free(type);
+    free(ville_depart);
+    free(ville_arrivee);
+    free(heure_depart);
+    free(heure_arrivee);
+    
+    return requete;
+}
+
+</code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">creer_requete_filtre</h1><h3 id="creer_requete_filtre" style="color:skyblue;"> Fonction qui crée une requête de demande de filtrage en demandant au client les infos</h3><br><span style="color:green;"> @parar	{char*} pRequetePrecedente, requete precedemment envoyée par le client</span><br><span style="color:green;"> @return	{char*} requete, la nouvelle requete de filtrage crée</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+char* creer_requete_filtre(char* pRequetePrecedente) {
+    char* tmpRequete;
+    tmpRequete = (char*)malloc(strlen(pRequetePrecedente)*sizeof(char));
+    int erreur = 0;
+    
+    sprintf(tmpRequete, "%s", pRequetePrecedente);
+    char** requete = diviseur_chaine(tmpRequete, '?');
+    
+    if (strcmp(requete[0], "trainParHoraireDepart") != 0) {
+        char* oui_non = (char*) malloc(3*sizeof(char));
+        char* filtre = (char*) malloc(5*sizeof(char));
+        
+        //Tant que l'utilisateur donne un nom de ville avec plus de 30 caractères
+        printf("Voulez-vous filtrer ou trier les résulats ? (oui, non ou tri) \n");
+        do {
+            fflush(stdin);
+            fgets(oui_non, 30*sizeof(char), stdin);
+            clean(oui_non, stdin);
+            if ((strcmp(oui_non, "oui") != 0) &amp;&amp; (strcmp(oui_non, "non") &amp;&amp; (strcmp(oui_non, "tri")) != 0)) {
+                printf("Merci de dire oui, non ou tri \n");
+                erreur = 1;
+            }
+            else
+                erreur = 0;
+        } while(erreur);
+        
+        
+        //Si l'utilisateur veut filtrer
+        if (strcmp(oui_non, "oui") == 0) {
+            //requete = (char*) malloc((strlen(pRequetePrecedente)+5)*sizeof(char));
+            
+            //Tant que l'utilisateur donne un nom de ville avec plus de 30 caractères
+            printf("Par quoi voulez-vous filtrez ? (prix ou durée)\n");
+            do {
+                fflush(stdin);
+                fgets(filtre, 30*sizeof(char), stdin);
+                clean(filtre, stdin);
+                if ((strcmp(filtre, "prix") != 0) &amp;&amp; (strcmp(filtre, "durée") != 0) &amp;&amp; (strcmp(filtre, "duree") != 0)) {
+                    printf("Merci choisir prix ou durée \n");
+                    erreur = 1;
+                }
+                else
+                    erreur = 0;
+            } while(erreur);
+            
+            //Si l'utilisateur a choisi prix
+            if (strcmp(filtre, "prix") == 0) {
+                //On remplace l'ancienne option par prix
+                pRequetePrecedente[strlen(pRequetePrecedente)-6] = '\0';
+                sprintf(pRequetePrecedente, "%s%s",pRequetePrecedente, "PRIX?");
+            }
+            //Si l'utilisateur a choisi durée
+            if ((strcmp(filtre, "durée") == 0) || strcmp(filtre, "duree") == 0) {
+                //On remplace l'ancienne option par durée
+                pRequetePrecedente[strlen(pRequetePrecedente)-6] = '\0';
+                sprintf(pRequetePrecedente, "%s%s", pRequetePrecedente, "DUREE?");
+            }
+        }
+        
+        //Si l'utilisateur veut trier
+        if (strcmp(oui_non, "tri") == 0) {
+            printf("Par quoi voulez-vous trier ? (prix ou durée)\n");
+            do {
+                fflush(stdin);
+                fgets(filtre, 30*sizeof(char), stdin);
+                clean(filtre, stdin);
+                if ((strcmp(filtre, "prix") != 0) &amp;&amp; (strcmp(filtre, "durée") != 0) &amp;&amp; (strcmp(filtre, "duree") != 0)) {
+                    printf("Merci choisir prix ou durée \n");
+                    erreur = 1;
+                }
+                else
+                    erreur = 0;
+            } while(erreur);
+            
+            //Si l'utilisateur a choisi prix
+            if (strcmp(filtre, "prix") == 0) {
+                //On remplace l'ancienne option par tprix
+                pRequetePrecedente[strlen(pRequetePrecedente)-6] = '\0';
+                sprintf(pRequetePrecedente, "%s%s",pRequetePrecedente, "TPRIX?");
+            }
+            //Si l'utilisateur a choisi durée
+            if ((strcmp(filtre, "durée") == 0) || strcmp(filtre, "duree") == 0) {
+                //On remplace l'ancienne option par tdurée
+                pRequetePrecedente[strlen(pRequetePrecedente)-6] = '\0';
+                sprintf(pRequetePrecedente, "%s%s", pRequetePrecedente, "TDUREE?");
+            }
+        }
+        
+        //On libère la mémoire
+        free(oui_non);
+        free(filtre);
+    }
+    
+    return pRequetePrecedente;
+}
+
+
+
+</code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">EstLettre</h1><h3 id="EstLettre" style="color:skyblue;"> Fonction qui verifie si un caractere est une lettre de l'alphabet</h3><br><span style="color:green;"> @parar	{char} pLettre</span><br><span style="color:green;"> @return	{int} retourne 1(vrai) ou 0(faux) celon si pLettre est une lettre</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+int EstLettre(char pLettre){
+    return ((pLettre&gt;='A' &amp;&amp; pLettre&lt;='Z') || (pLettre&gt;='a' &amp;&amp; pLettre&lt;='z'));
+}
+</code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">EstVilleValide</h1><h3 id="EstVilleValide" style="color:skyblue;"> Fonction qui verifie que le nom d'une ville est valide</h3><br><span style="color:green;"> On veut que çà contiennent des lettres ou des tiret/espaces si ces derniers sont entourés de lettres</span><br><span style="color:green;"> La taille minimal est de 3 lettres</span><br><span style="color:green;"> @parar	{char*} pChaine à verifier</span><br><span style="color:green;"> @return	{int} retourne 1(vrai) ou 0(faux) celon si pChaine est correcte ou non.</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+int EstVilleValide(char* pChaine){
+
+}
+
+</code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">atoiHeure</h1><h3 id="atoiHeure" style="color:skyblue;"> La fonction transforme un char* "heure:minute" en int* {heure, minute}</h3><br><span style="color:green;"> @param {char*} pHeure :</span><br><span style="color:green;"> @return {int*} pointeur de int contenant les valeur dans pHeure</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+int* atoiHeure(char* pHeure)
+{
+    char* tmpHeure = (char*) malloc(strlen(pHeure)*sizeof(char));
+    sprintf(tmpHeure, "%s", pHeure);
+    char** tmpTableauHoraire;
+    int* tmpTableauResult;
+    tmpTableauResult = (int*)malloc(2*sizeof(int));
+    
+    tmpTableauHoraire = diviseur_chaine(tmpHeure,':');
+    
+    tmpTableauResult[0] = atoi(tmpTableauHoraire[0]);
+    tmpTableauResult[1] = atoi(tmpTableauHoraire[1]);
+    
+    free(tmpHeure);
+    return tmpTableauResult;
+}
+
+
+
+</code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">diviseur_chaine</h1><h3 id="diviseur_chaine" style="color:skyblue;"> La méthode découpe la chaine de caractere à partir d'un délimiteur passé en parametre</h3><br><span style="color:green;"> @param {char*} pChaine : Chaine de caractere à traiter</span><br><span style="color:green;"> @param {char} pDelimiteur : Delimiteur à appliquer sur la chaine</span><br><span style="color:green;"> @return {char**} tableau de chaine de caracteres separé par le delimiteur et se finissant par (char*)0</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+char** diviseur_chaine(char* pChaine, const char pDelimiteur)
+{
+    char** tmpResultat = 0;
+    size_t tmpCompteur = 0;
+    char* tmpChaine = pChaine;
+    char* tmpLigneCourante = 0;
+    char tmpDelimiteur[2];
+    size_t tmpId;
+    char* token;
+    tmpDelimiteur[0] = pDelimiteur;
+    tmpDelimiteur[1] = 0;
+    
+    //On compte le nombre de chaine séparé par un délimiteur
+    while (*tmpChaine)
+    {
+        if (pDelimiteur == *tmpChaine)
+        {
+            tmpCompteur++;
+            tmpLigneCourante = tmpChaine;
+        }
+        tmpChaine++;
+    }
+    
+    //Si le pointeur se trouve dans la chaine il reste un mot à prendre en compte
+    tmpCompteur += tmpLigneCourante &lt; (pChaine + strlen(pChaine) - 1);
+    //Puis on ajoute un pour le mot 0
+    tmpCompteur++;
+    //On alloue la mémoire au tableau resultat celon le nombre de mots
+    tmpResultat = malloc(sizeof(char*) * tmpCompteur);
+    
+    tmpId  = 0;
+    token = strtok(pChaine, tmpDelimiteur);
+    
+    //tant qu'on a des mots on remplit notre tableau
+    while (token)
+    {
+        *(tmpResultat + tmpId++) = strdup(token);
+        token = strtok(0, tmpDelimiteur);
+    }
+    //on ajoute le mot 0
+    *(tmpResultat + tmpId) = 0;
+    
+    return tmpResultat;
+}
+
+
+</code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">calculHeurePtrPtr</h1><h3 id="calculHeurePtrPtr" style="color:skyblue;"> La fonction calcul l'ecart entre 2 horaires differents</h3><br><span style="color:green;"> @param {int*} pHeureMin :</span><br><span style="color:green;"> @param {int*} pHeureMax :</span><br><span style="color:green;"> @return {int} retourn la difference convertie en minutes</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+int calculHeurePtrPtr(int* pHoraireMin, int* pHoraireMax)
+{
+    return 60*(pHoraireMax[0]-pHoraireMin[0]) + (pHoraireMax[1]-pHoraireMin[1]);
+}
+
+
+</code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">envoie_requete_serveur</h1><h3 id="envoie_requete_serveur" style="color:skyblue;"> La fonction ecrit des données pour le serveur</h3><br><span style="color:green;"> @param {int} pSocket : Socket d'ecoute du serveur</span><br><span style="color:green;"> @return void</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+void envoie_requete_serveur(int pSocket){
+    //Ecrire un while pour le buffer pour qu'il transmete tout le message
+    //char* tmpMessage = "Je me présente je m'appel Heny, je voudrais bien réussir ma vie... SALUT JIMMY";
+    char* tmpMessage = (char*) malloc(100*sizeof(char));
+    char* tmpMessagePrec;
+    int* tmpTailleBuffer = (int*)malloc(sizeof(int));
+    int fin = 0;
+    char* oui_non = (char*) malloc(4*sizeof(char));
+    int *taille_tampon=(int*)malloc(sizeof(int));
+    char* tmpReponse;
+    while(fin == 0) {
+        tmpMessage = creer_requete(tmpMessage);
+        *tmpTailleBuffer = strlen(tmpMessage);
+        //On envoie la taille du paquet
+        write(pSocket,tmpTailleBuffer,sizeof(int));
+        //On envoie le paquet
+        write(pSocket,tmpMessage,*tmpTailleBuffer);
+        
+        //read réponse du serveur 
+        read(pSocket,taille_tampon,sizeof(int));
+        tmpReponse=(char*)malloc(sizeof(char)*(*taille_tampon));
+        read(pSocket,tmpReponse,*taille_tampon);
+        // puts(tmpReponse);
+        
+        char* tmpReponseAAfficher = tmpReponse;
+        afficher_requete_resultat(tmpReponseAAfficher);
+        // ###############################################################################################################
+        //Requete filtre
+        tmpMessagePrec = (char*) malloc(strlen(tmpMessage)*sizeof(char));
+        //Sauvegarde de la requete envoyé
+        sprintf(tmpMessagePrec, "%s", tmpMessage);
+        
+        
+        if (strstr(tmpReponse,"!0!") == NULL) {
+            tmpMessage = creer_requete_filtre(tmpMessage);
+            //Si la requete a été modifié l'utilsateur veut filtrer
+            if (strcmp(tmpMessage,tmpMessagePrec) != 0) {
+                *tmpTailleBuffer = strlen(tmpMessage);
+                //On envoie la taille du paquet
+                // printf("je renvoie une requete");
+                write(pSocket,tmpTailleBuffer,sizeof(int));
+                //On envoie le paquet
+                write(pSocket,tmpMessage,*tmpTailleBuffer);
+                
+                //read réponse du serveur 
+                read(pSocket,taille_tampon,sizeof(int));
+                tmpReponse=(char*)malloc(sizeof(char)*(*taille_tampon));
+                read(pSocket,tmpReponse,*taille_tampon);
+                afficher_requete_resultat(tmpReponse);
+                // puts(tmpReponse);
+            }
+        }
+        else
+            puts("Aucun train correspondant à votre recherche\n");
+        printf("Voulez-vous quitter ? (oui ou non) \n");
+        scanf("%s", oui_non);
+        //Tant que l'utilisateur ne répond pas oui ou non on lui redemande
+        while ((strcmp(oui_non, "oui") != 0) &amp;&amp; (strcmp(oui_non, "non") != 0) ) {
+            printf("Merci de dire oui ou non \n");
+            scanf("%s", oui_non);
+        }
+        if (strcmp(oui_non, "oui") == 0) {
+            fin = 1;
+            //On envoie la taille du paquet
+            sprintf(tmpMessage, "%s","Fin connexion?");
+            *tmpTailleBuffer = strlen(tmpMessage);	
+            write(pSocket,tmpTailleBuffer,sizeof(int));
+            //On envoie le paquet
+            write(pSocket,tmpMessage,*tmpTailleBuffer);
+        }
+        viderBuffer();		
+    }
+    
+    free(tmpMessage);
+    free(tmpMessagePrec);
+    free(oui_non);
+    free(tmpTailleBuffer);
+    free(taille_tampon);
+    free(tmpReponse);				
+}
+
+//
+ * La fonction parse et affiche la requete en parametre
+ * @param {char*} pReponse : Requete a afficher sous forme de string
+ * @return void
+ 
+void afficher_requete_resultat(char* pReponse)
+{
+
+    char** tmpReponseDecomposeParam;
+    char** tmpReponseDecomposeLigne;
+    char** tmpReponseDecomposeInfo;
+
+    
+    tmpReponseDecomposeParam = diviseur_chaine(pReponse,'!');
+    int tmpTailleTableau = atoi(tmpReponseDecomposeParam[1]);
+    tmpReponseDecomposeLigne = diviseur_chaine(tmpReponseDecomposeParam[0],'@');
+    
+    puts("");
+
+    for (int i =0; i&lt; tmpTailleTableau; i++)
+    {
+        // puts(tmpReponseDecomposeLigne[i]);
+        tmpReponseDecomposeInfo = diviseur_chaine(tmpReponseDecomposeLigne[i],'?');
+        
+        printfc(tmpReponseDecomposeInfo[0] , ROUGE, FOND_JAUNE);
+        puts("");
+        printfc(tmpReponseDecomposeInfo[1] , BLEU, FOND_VERT);
+        puts("");
+        printfc(tmpReponseDecomposeInfo[2] , MAGENTA, FOND_VERT);
+        puts("");
+        printfc(tmpReponseDecomposeInfo[3] , BLEU, FOND_VERT);
+        puts("");
+        printfc(tmpReponseDecomposeInfo[4] , MAGENTA, FOND_VERT);
+        puts("");
+        printfc(tmpReponseDecomposeInfo[5] , BLANC, FOND_ROUGE);
+        puts("");
+
+        puts("");
+        
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+</code></pre></div>
+
+<script>
+  var openFile = function(event) {
+
+  	let tmpFonctionListe = [];
+
+    var input = event.target;
+
+    var reader = new FileReader();
+    reader.onload = function(){
+      var text = reader.result;
+      let output = reader.result.substring(0, 20000000);
+      //On repere les commentaire et on crÃ©Ã© un tableau adaptÃ©
+      let tmpCommentaire = output.split("/**\n *");
+      let tmpCommentaireSplit = tmpCommentaire.map((e,i)=>{
+      	if(i!=0)
+      		return e.split("*/").map(m=>{
+      			return m.split("\n");
+      		});
+      });
+      console.log(tmpCommentaireSplit);
+      //Generation du HTML
+      let tmpSelector = document.querySelectorAll("#dochtml")[0];
+      let tmpDocGenerer = "";
+
+	  tmpCommentaireSplit.map((e,i)=>{
+	  	if(typeof(e)=="undefined") return;
+	  	var tmpPositionDebutFonction = e[1][1].indexOf(" ");
+	  	var tmpPositionFinFonction = e[1][1].indexOf("(");
+	  	var tmpNomFonction = e[1][1].substr(tmpPositionDebutFonction,tmpPositionFinFonction-tmpPositionDebutFonction)
+	  		tmpFonctionListe.push(tmpNomFonction);
+	  	
+	  	let tmpParams = e[0].map((j,i)=>{
+	  		if(i==0){
+	  			let tmpTitefonction = "<h1 style='color:white;background-color:rgba(0,0,0,0.5);'>"+tmpNomFonction.replace(" ","")+"</h1>";
+	  			return tmpTitefonction+"<h3 id='"+tmpNomFonction.replace(" ","")+"' style='color:skyblue;'>"+j+"</h3>";
+	  		}
+	  		return "<span style='color:green;'>"+j.slice(2)+"</span>";
+	  	}).join("<br>");
+	  	tmpDocGenerer+=tmpParams;
+	  	let tmpCode = "";
+	  	console.log(tmpCommentaireSplit[i]);
+	  	console.log(tmpCommentaireSplit[i].map((ej,ei)=>{
+	  		if(ei==0) return;
+	  		tmpCode+=ej.join("\r\n").replace("/*","//");
+	  	}),tmpCode);
+	  	tmpDocGenerer+='<pre><code class="language-javascript">'+tmpCode+'</code></pre>';
+	  });
+
+
+
+      let tmpSelectorNOmFonction = document.querySelectorAll("#fonction_liste")[0];
+      let tmpFonctionListHTML= tmpFonctionListe.reduce((acc,e,i)=>{
+      	acc=acc+"<br><a style='margin-left:20px;' href='#"+e.replace(" ","")+"'>"+e+"</a>";
+      	return acc;
+      },"");
+	  tmpSelectorNOmFonction.innerHTML="<a href='index.html'>ACCUEIL</a><br/>"+tmpFonctionListHTML;
+      tmpSelector.innerHTML=tmpDocGenerer;
+    };
+    reader.readAsText(input.files[0]);
+  };
+</script>
+
+
+
+
+
+	
+
+
+</body></html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+	<link href="test_files/prism.css" rel="stylesheet">
+	<script src="test_files/prism.js"></script>
+	</head>
+	<body>
+
+
+
+<input onchange="openFile(event)" type="file"><br>
+<div id="fonction_liste" style="background-color:white;right:0;position:fixed;width:20%;"><a href="index.html">ACCUEIL</a><br><br><a style="margin-left:20px;" href="#rechercherTrainParHoraireDepart"> rechercherTrainParHoraireDepart</a><br><a style="margin-left:20px;" href="#rechercherTrainsParDestionation"> rechercherTrainsParDestionation</a><br><a style="margin-left:20px;" href="#rechercherTrainsParTrancheHoraires"> rechercherTrainsParTrancheHoraires</a></div>
+<div id="dochtml" style="margin-top:50px;"><h1 style="color:white;background-color:rgba(0,0,0,0.5);">rechercherTrainParHoraireDepart</h1><h3 id="rechercherTrainParHoraireDepart" style="color:skyblue;"> La fonction recherche un voyage parmis les voyages contenu dans pTableau</h3><br><span style="color:green;"> @param {char*} pVille_depart :</span><br><span style="color:green;"> @param {char*} pVille_arrive :</span><br><span style="color:green;"> @param {char*} pHeure_depart : Delimiteur à appliquer sur la chaine</span><br><span style="color:green;"> @param {TableauVoyage*} pTableau :</span><br><span style="color:green;"> @return {voyage} struct voyage du voyage en question ou voyage NULL</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+TableauVoyage* rechercherTrainParHoraireDepart(char* pVille_depart, char* pVille_arrive, char* pHeure_depart, TableauVoyage *pTableau)
+{
+    const int tmpTailleTableau = calculerTailleTableau(pTableau);
+    TableauVoyage *tmpTableau=NULL;
+    int* tmpHeure_depart = atoiHeure(pHeure_depart);
+    
+    for (int i = 0; i<tmptailletableau; ptableau="pTableau-">suivant, i++) {
+        // Si train trouve a la bonne heure, meme heure meme minute 
+        if(strcmp(pTableau-&gt;v.ville_depart, pVille_depart) == 0 &amp;&amp;
+           strcmp(pTableau-&gt;v.ville_arrive, pVille_arrive) == 0 &amp;&amp;
+           pTableau-&gt;v.heure_depart.heure == tmpHeure_depart[0] &amp;&amp;
+           pTableau-&gt;v.heure_depart.minute == tmpHeure_depart[1])
+        {
+            printf("1 Train trouvé\n");
+            //free(*(tmpHeure_depart));
+            tmpTableau = ajouter_voyage(tmpTableau, &amp;pTableau-&gt;v);
+            return tmpTableau;
+        }
+        // Si train trouve le plus proche, apres l'heure indique, Si (heure depart demandé == heure depart train) et (minute depart train &gt; minute depart demande)  
+        else if(
+                (strcmp(pTableau-&gt;v.ville_depart, pVille_depart) == 0 &amp;&amp;
+                 strcmp(pTableau-&gt;v.ville_arrive, pVille_arrive) == 0) &amp;&amp;
+                pTableau-&gt;v.heure_depart.heure == tmpHeure_depart[0] &amp;&amp;
+                pTableau-&gt;v.heure_depart.minute &gt; tmpHeure_depart[1]
+                )
+        {
+            printf("\n1 Train plus proche trouvé\n");
+            //free(tmpHeure_depart);
+            return tmpTableau = ajouter_voyage(tmpTableau, &amp;pTableau-&gt;v);
+        }
+        // Si train trouve le plus proche, apres l'heure indique, Si (heure depart train &gt; heure depart demandé)
+        else if(
+                (strcmp(pTableau-&gt;v.ville_depart, pVille_depart) == 0 &amp;&amp;
+                strcmp(pTableau-&gt;v.ville_arrive, pVille_arrive) == 0) &amp;&amp;
+                (pTableau-&gt;v.heure_depart.heure &gt; tmpHeure_depart[0])
+                )
+        {
+            printf("\n1 Train plus proche trouvé\n");
+            //free(tmpHeure_depart);
+            return tmpTableau = ajouter_voyage(tmpTableau, &amp;pTableau-&gt;v);
+        }
+    }
+    printf("\nAucun Train trouvé\n");
+    //free(*(tmpTableauHoraireDepart));
+    return NULL;
+}
+
+
+</tmptailletableau;></code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">rechercherTrainsParDestionation</h1><h3 id="rechercherTrainsParDestionation" style="color:skyblue;"> La fonction recherche tout voyage d'un point a un autre parmis les voyages contenu dans pTableau</h3><br><span style="color:green;"> @param {char*} pVille_depart :</span><br><span style="color:green;"> @param {char*} pVille_arrive :</span><br><span style="color:green;"> @param {TableauVoyage*} pTableau :</span><br><span style="color:green;"> @return {TableauVoyage*} tableau contenant les voyages en question</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+TableauVoyage* rechercherTrainsParDestionation(char* pVille_depart, char* pVille_arrive, TableauVoyage *pTableau)
+{
+    const int tmpTailleTableau = calculerTailleTableau(pTableau);
+    TableauVoyage *tmpTableau=NULL;
+    // int tmpCompteur = 0;
+    
+    for (int i = 0; i<tmptailletableau; ptableau="pTableau-">suivant, i++)
+    {
+        // Si train avec meme depart et meme dest
+        if(strcmp(pTableau-&gt;v.ville_depart, pVille_depart) == 0 &amp;&amp;
+           strcmp(pTableau-&gt;v.ville_arrive, pVille_arrive) == 0)
+        {
+            // printf("Train trouvé\n");
+            tmpTableau = ajouter_voyage(tmpTableau, &amp;pTableau-&gt;v);
+            // tmpCompteur++;
+        }
+    }
+    
+    if(tmpTableau == NULL)
+    {
+        // printf("Aucun Train trouvé\n");
+        return NULL;
+    }
+    else
+    {
+        // printf("%d Train(s) trouvé(s)\n", tmpCompteur);
+        return tmpTableau;
+    }
+}
+
+</tmptailletableau;></code></pre><h1 style="color:white;background-color:rgba(0,0,0,0.5);">rechercherTrainsParTrancheHoraires</h1><h3 id="rechercherTrainsParTrancheHoraires" style="color:skyblue;"> La fonction recherche tout voyage d'un point a un autre parmis les voyages contenu dans pTableau</h3><br><span style="color:green;"> @param {char*} pVille_depart :</span><br><span style="color:green;"> @param {char*} pVille_arrive :</span><br><span style="color:green;"> @param {char*} pHeure_depart_min :</span><br><span style="color:green;"> @param {char*} pHeure_depart_max :</span><br><span style="color:green;"> @param {TableauVoyage*} pTableau :</span><br><span style="color:green;"> @return {TableauVoyage*} tableau contenant les voyages en question</span><br><span style="color:green;"></span><pre><code class="language-javascript">
+TableauVoyage* rechercherTrainsParTrancheHoraires(char* pVille_depart, char* pVille_arrive, char* pHeure_depart_min, char* pHeure_depart_max, TableauVoyage *pTableau)
+{
+    const int tmpTailleTableau = calculerTailleTableau(pTableau);
+    TableauVoyage *tmpTableau=NULL;
+    // int tmpCompteur = 0;
+    
+    // On transforme nos char** en int* pour les comparer avec nos int dans la struct 
+    int* tmpHeure_min = atoiHeure(pHeure_depart_min);
+    int* tmpHeure_max = atoiHeure(pHeure_depart_max);
+    
+    // Calcul ecart (en minutes) entre pHeure_depart_min et pHeure_depart_max 
+    int tmpEcartMax = calculHeurePtrPtr(tmpHeure_min, tmpHeure_max);
+    // printf("tmpEcartMax = %d\n", tmpEcartMax);
+
+    for (int i = 0; i<tmptailletableau; ptableau="pTableau-">suivant, i++)
+    {
+        // Calcul de l'ecart entre la valeur max et l'heure de la struct parcouru  
+        int tmpEcartValeurEnCours = calculHeureIntPtr(pTableau-&gt;v.heure_depart.heure, pTableau-&gt;v.heure_depart.minute, tmpHeure_max);
+        // printf("heure de depart du train = %d heure d'arriver du train = %d, heure max %d:%d \n", pTableau-&gt;v.heure_depart.heure, pTableau-&gt;v.heure_depart.minute, tmpHeure_max[0], tmpHeure_max[1]);
+        // printf("tmpEcart entre l heure du train et le heure maximum = %d\n", tmpEcartValeurEnCours);
+
+        // tmpEcartValeurEnCours = tmpEcartMax - tmpEcartValeurEnCours;
+
+        // Si ville depart et ville arrive coincide 
+        if (strcmp(pTableau-&gt;v.ville_depart, pVille_depart) == 0 &amp;&amp;
+            strcmp(pTableau-&gt;v.ville_arrive, pVille_arrive) == 0 &amp;&amp;
+            tmpEcartValeurEnCours &lt;= tmpEcartMax &amp;&amp;
+            tmpEcartValeurEnCours &gt; 0)
+        {
+            // printf("Train trouvé\n");
+            tmpTableau = ajouter_voyage(tmpTableau, &amp;pTableau-&gt;v);
+            // tmpCompteur++;
+        }
+    }
+
+    if(tmpTableau == NULL)
+    {
+        // printf("Aucun Train trouvé\n");
+        return NULL;
+    }
+    else
+    {
+        // printf("%d Train(s) trouvé(s)\n", tmpCompteur);
+        return tmpTableau;
+    }
+}
+
+</tmptailletableau;></code></pre></div>
+
+<script>
+  var openFile = function(event) {
+
+  	let tmpFonctionListe = [];
+
+    var input = event.target;
+
+    var reader = new FileReader();
+    reader.onload = function(){
+      var text = reader.result;
+      let output = reader.result.substring(0, 20000000);
+      //On repere les commentaire et on crÃ©Ã© un tableau adaptÃ©
+      let tmpCommentaire = output.split("/**\n *");
+      let tmpCommentaireSplit = tmpCommentaire.map((e,i)=>{
+      	if(i!=0)
+      		return e.split("*/").map(m=>{
+      			return m.split("\n");
+      		});
+      });
+      console.log(tmpCommentaireSplit);
+      //Generation du HTML
+      let tmpSelector = document.querySelectorAll("#dochtml")[0];
+      let tmpDocGenerer = "";
+
+	  tmpCommentaireSplit.map((e,i)=>{
+	  	if(typeof(e)=="undefined") return;
+	  	var tmpPositionDebutFonction = e[1][1].indexOf(" ");
+	  	var tmpPositionFinFonction = e[1][1].indexOf("(");
+	  	var tmpNomFonction = e[1][1].substr(tmpPositionDebutFonction,tmpPositionFinFonction-tmpPositionDebutFonction)
+	  		tmpFonctionListe.push(tmpNomFonction);
+	  	
+	  	let tmpParams = e[0].map((j,i)=>{
+	  		if(i==0){
+	  			let tmpTitefonction = "<h1 style='color:white;background-color:rgba(0,0,0,0.5);'>"+tmpNomFonction.replace(" ","")+"</h1>";
+	  			return tmpTitefonction+"<h3 id='"+tmpNomFonction.replace(" ","")+"' style='color:skyblue;'>"+j+"</h3>";
+	  		}
+	  		return "<span style='color:green;'>"+j.slice(2)+"</span>";
+	  	}).join("<br>");
+	  	tmpDocGenerer+=tmpParams;
+	  	let tmpCode = "";
+	  	console.log(tmpCommentaireSplit[i]);
+	  	console.log(tmpCommentaireSplit[i].map((ej,ei)=>{
+	  		if(ei==0) return;
+	  		tmpCode+=ej.join("\r\n").replace("/*","//");
+	  	}),tmpCode);
+	  	tmpDocGenerer+='<pre><code class="language-javascript">'+tmpCode+'</code></pre>';
+	  });
+
+
+
+      let tmpSelectorNOmFonction = document.querySelectorAll("#fonction_liste")[0];
+      let tmpFonctionListHTML= tmpFonctionListe.reduce((acc,e,i)=>{
+      	acc=acc+"<br><a style='margin-left:20px;' href='#"+e.replace(" ","")+"'>"+e+"</a>";
+      	return acc;
+      },"");
+	  tmpSelectorNOmFonction.innerHTML="<a href='index.html'>ACCUEIL</a><br/>"+tmpFonctionListHTML;
+      tmpSelector.innerHTML=tmpDocGenerer;
+    };
+    reader.readAsText(input.files[0]);
+  };
+</script>
+
+
+
+
+
+	
+
+
+</body></html>

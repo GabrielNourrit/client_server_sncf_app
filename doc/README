@@ -1,0 +1,29 @@
+this project was developed by Chevallier Jimmy, Koc Mickael, Noel Jules and Nourrit Gabriel
+
+##########################################################################################################
+
+Pour compiler le projet :
+
+		taper make dans la racine du dossier
+
+##########################################################################################################
+
+Pour lancer le projet :
+		
+		taper make run dans la racine du dossier
+
+##########################################################################################################
+
+Information à renseigner lors du lancement :
+
+		Choisir :
+			- 1 si vous voulez lancer seulement le serveur
+			- 2 si vous voulez lancer seulement le client
+			- 3 si vous voulez lancer le client et le serveur
+
+		Renseigner ensuite les infos suivantes :
+			- numéro du port (renseigner un port avec un chiffre assez grand ex : 1000)
+			- nom d'hôtes (nom ou @IP)
+
+##########################################################################################################
+
